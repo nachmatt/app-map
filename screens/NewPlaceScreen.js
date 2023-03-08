@@ -4,6 +4,7 @@ import { COLORS } from '../constants'
 import { addPlace } from '../store/places.actions'
 import { useDispatch } from 'react-redux'
 import ImageSelector from '../components/ImageSelector'
+import LocationSelector from '../components/LocationSelector'
 
 const NewPlaceScreen = ({ navigation }) => {
     const [title, setTitle] = useState('')
@@ -22,6 +23,7 @@ const NewPlaceScreen = ({ navigation }) => {
                 <Text style={styles.label}>Título</Text>
                 <TextInput style={styles.input} onChangeText={handleTitleChange}/>
                 <ImageSelector onImage={setImage}/>
+                <LocationSelector onLocation={location => console.log(location)}/>
                 <Button title='Guardar Dirección' color={COLORS.MAROON} onPress={handleSave}/>
             </View>
         </ScrollView>
