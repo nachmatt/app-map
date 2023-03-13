@@ -1,11 +1,23 @@
+import React, { useState, useEffect } from 'react'
 import { StyleSheet, Text, View, Button, Alert } from 'react-native'
-import React, { useState } from 'react'
+import { useNavigation } from '@react-navigation/native'
 import * as Location from 'expo-location'
+
 import {COLORS} from '../constants'
+import MapPreview from './MapPreview'
+
 
 const LocationSelector = (props) => {
+    const navigation = useNavigation()
     const [pickedLocation, setPickedLocation] = useState()
-    // https://maps.googleapis.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=13&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794&markers=color:green%7Clabel:G%7C40.711614,-74.012318&markers=color:red%7Clabel:C%7C40.718217,-73.998284&key=YOUR_API_KEY&signature=YOUR_SIGNATURE
+
+    useEffect(() => {
+        if (props.mapLocation) {
+            setPickedLocation(props.mapLocation)
+            props.onLocation(props.mapLocation)
+        }
+    }, [props.mapLocation])
+
     const handleGetLocation = async () => {
         const isLocationOk = await verifyPermissions()
         if (!isLocationOk) return
@@ -37,22 +49,26 @@ const LocationSelector = (props) => {
         }
         return true
     }
+    const handlePickOnMap = () => {
+        const isLocationOk = verifyPermissions()
+        if(!isLocationOk) return
+
+        navigation.navigate('Map')
+    }
 
     return (
         <View style={styles.container}>
-            <View style={styles.preview}>
-                {pickedLocation ? (
-                    <Text>
-                        {pickedLocation.lat}, {pickedLocation.lng}
-                    </Text>
-                ): (
-                    <Text>Esperando ubicación</Text>
-                )}
+            <MapPreview location={pickedLocation} style={styles.preview}>
+                <Text>Ubicación en proceso...</Text>
+            </MapPreview>
+            <View style={styles.actions}>
+                <Button 
+                    title='Obtener ubicación' 
+                    color={COLORS.PEACH_PUFF} 
+                    onPress={handleGetLocation}
+                />
+                <Button title='Elegir del mapa' color={COLORS.LIGTH_PINK} onPress={handlePickOnMap}/>
             </View>
-            <Button 
-                title='Obtener ubicación' 
-                color={COLORS.PEACH_PUFF} 
-                onPress={handleGetLocation}></Button>
         </View>
     )
 }
@@ -72,4 +88,8 @@ const styles = StyleSheet.create({
         borderColor: COLORS.BLUSH,
         borderWidth: 1
     },
+    actions: {
+        flexDirection: 'row',
+        justifyContent: 'space-around'
+    }
 })
